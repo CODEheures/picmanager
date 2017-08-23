@@ -56,6 +56,7 @@ class PictureController extends Controller
     }
 
     public function infos() {
+        $freeSpaceServer = disk_free_space(__DIR__);
         $files = [];
         $size = 0;
         try {
@@ -63,9 +64,20 @@ class PictureController extends Controller
             foreach ($files as $file){
                 $size += Storage::size($file);
             }
-            return response()->json(['name' => $_SERVER['HTTP_HOST'],'count' => count($files), 'size' =>round($size/(1024*1024),0), 'load' => round(100*count($files)/(self::MAX_FILE_PER_DIR*self::MAX_DIR),2)]);
+
+            $count_load = round(100*count($files)/(self::MAX_FILE_PER_DIR*self::MAX_DIR),2);
+            $bytes_load  = round(100*(1/$freeSpaceServer),2);
+            $most_restrictive_load = max($count_load, $bytes_load);
+            return response()->json([
+                'name' => $_SERVER['HTTP_HOST'],
+                'count' => count($files),
+                'size' =>$this->octectToMbytes($size),
+                'count_load' => $count_load,
+                'bytes_load' => $bytes_load,
+                'load' => $most_restrictive_load
+            ]);
         } catch (\Exception $e) {
-            return response()->json(['name' => $_SERVER['HTTP_HOST'],'count' => count($files), 'size' =>round($size/(1024*1024),0), 'load' => 100]);
+            return response()->json(['name' => $_SERVER['HTTP_HOST'],'count' => count($files), 'size' =>$this->octectToMbytes($size), 'count_load' => 100, 'bytes_load' => 100]);
         }
     }
 
@@ -192,6 +204,9 @@ class PictureController extends Controller
             case 'png':
                 return 'image/png';
                 break;
+            case 'webp':
+                return 'image/webp';
+                break;
             default:
                 return null;
         }
@@ -257,4 +272,7 @@ class PictureController extends Controller
         }
     }
 
+    private function octectToMbytes($value) {
+        return round($value/(1024*1024),0);
+    }
 }
