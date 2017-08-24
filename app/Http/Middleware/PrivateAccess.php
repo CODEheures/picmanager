@@ -16,7 +16,11 @@ class PrivateAccess
         if(in_array($_SERVER['REMOTE_ADDR'], config('routes.privates_ips'))){
             return $next($request);
         } else {
-            return response(null, 403);
+            if(env('APP_DEBUG')==true){
+                return response('Forbidden ' . $_SERVER['REMOTE_ADDR'], 403);
+            } else {
+                return response(null, 403);
+            }
         }
     }
 }
