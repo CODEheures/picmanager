@@ -25,7 +25,7 @@ class PictureController extends Controller
 
 
     public function __construct() {
-        $this->middleware('privateAccess', ['except' => ['getNormal', 'getThumb', 'infoLocalFiles']]);
+        $this->middleware('privateAccess', ['except' => ['get', 'infoLocalFiles']]);
         $this->appPath = storage_path(self::APP_PATH);
         $this->appTempoPath = $this->appPath . self::TEMPO_PARENT_PATH;
         if(!is_dir($this->appPath)){ mkdir($this->appPath); }
