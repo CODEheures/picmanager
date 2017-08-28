@@ -32,12 +32,16 @@ class PictureController extends Controller
         if(!is_dir($this->appTempoPath)){ mkdir($this->appTempoPath); }
     }
 
-    public function get(string $format, string $dir, string $hashName, string $ext)  {
+    public function get(string $format, string $dir, string $hashName, string $ext, Request $request)  {
         $path = $this->pathFile($format, $dir, $hashName, $ext);
         $mime = static::mime($ext);
 
         if (file_exists($path) && $mime){
-            return response(file_get_contents($path),200)->header("Content-Type", $mime);
+            if($request->test_exist){
+                return response('exist', 200);
+            } else {
+                return response(file_get_contents($path),200)->header("Content-Type", $mime);
+            }
         } else {
             return response('not found', 404);
         }
