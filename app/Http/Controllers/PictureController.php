@@ -69,7 +69,7 @@ class PictureController extends Controller
                 $size += Storage::size($file);
             }
 
-            $count_load = round(100*count($files)/(self::MAX_FILE_PER_DIR*self::MAX_DIR),2);
+            $count_load = round(100*(count($files)-2)/(self::MAX_FILE_PER_DIR*self::MAX_DIR),2);
             $bytes_load  = round(100*(1/$freeSpaceServer),2);
             $most_restrictive_load = max($count_load, $bytes_load);
             return response()->json([
@@ -81,7 +81,7 @@ class PictureController extends Controller
                 'load' => $most_restrictive_load
             ]);
         } catch (\Exception $e) {
-            return response()->json(['name' => $_SERVER['HTTP_HOST'],'count' => count($files), 'size' =>$this->octectToMbytes($size), 'count_load' => 100, 'bytes_load' => 100]);
+            return response()->json(['name' => $_SERVER['HTTP_HOST'],'count' => (count($files)-2), 'size' =>$this->octectToMbytes($size), 'count_load' => 100, 'bytes_load' => 100]);
         }
     }
 
